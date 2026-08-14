@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXUS PAID GAMING ARENA | Play & Earn</title>
+<style>
+  :root {
+    --bg-dark: #05050b;
+    --card-bg: #0f0f1f;
+    --neon-green: #00ff66;
+    --neon-fire: #ff3300;
+    --neon-blue: #00d9ff;
+    --neon-gold: #ffd700;
+    --text-white: #ffffff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+  body { background: var(--bg-dark); color: var(--text-white); min-height: 100vh; display: flex; flex-direction: column; }
+
+  /* HEADER & WALLET */
+  header {
+    height: 70px; background: rgba(15, 15, 31, 0.95); border-bottom: 2px solid var(--neon-gold);
+    display: flex; align-items: center; justify-content: space-between; padding: 0 5%;
+    position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px);
+  }
+  .logo { font-size: 22px; font-weight: 900; letter-spacing: 2px; text-shadow: 0 0 10px var(--neon-gold); }
+  .logo span { color: var(--neon-green); }
+
+  .wallet-box {
+    display: flex; align-items: center; gap: 12px; background: #121228;
+    padding: 8px 16px; border-radius: 20px; border: 1px solid var(--neon-gold);
+  }
+  .balance-txt { font-weight: bold; color: var(--neon-gold); font-size: 15px; }
+  .add-money-btn {
+    background: var(--neon-green); color: #000; border: none; padding: 6px 12px;
+    border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.2s;
+  }
+  .add-money-btn:hover { background: #fff; transform: scale(1.05); }
+
+  /* HERO */
+  .hero { text-align: center; padding: 25px 20px 10px; }
+  .hero h1 {
+    font-size: clamp(24px, 5vw, 40px); font-weight: 900;
+    background: linear-gradient(90deg, var(--neon-gold), var(--neon-green), var(--neon-blue));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .hero p { color: #8a8ab0; margin-top: 5px; font-size: 14px; }
+
+  /* 4 CATEGORY BUTTONS */
+  .cat-container {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px; max-width: 950px; margin: 20px auto; padding: 0 20px; width: 100%;
+  }
+
+  .cat-btn {
+    padding: 16px; border: 2px solid #222244; background: var(--card-bg);
+    border-radius: 15px; color: #fff; cursor: pointer; transition: 0.3s;
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    font-size: 15px; font-weight: bold;
+  }
+  .cat-btn span { font-size: 28px; }
+  
+  .cat-btn:hover, .cat-btn.active { border-color: var(--neon-gold); background: rgba(255, 215, 0, 0.12); box-shadow: 0 0 15px rgba(255,215,0,0.3); }
+
+  /* GAME GRID */
+  .main-area { padding: 0 5% 50px; flex-grow: 1; }
+  .grid-title { margin-bottom: 20px; font-size: 20px; color: var(--neon-gold); text-align: center; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+
+  .card {
+    background: var(--card-bg); border: 1px solid #1f1f3a; border-radius: 14px; overflow: hidden;
+    display: flex; flex-direction: column; transition: 0.3s; position: relative;
+  }
+  .card:hover { transform: translateY(-7px); border-color: var(--neon-gold); box-shadow: 0 8px 20px rgba(255,215,0,0.25); }
+
+  .price-tag {
+    position: absolute; top: 10px; right: 10px; background: var(--neon-gold); color: #000;
+    padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 900;
+  }
+
+  .card-icon { height: 100px; background: #080814; display: flex; align-items: center; justify-content: center; font-size: 45px; }
+  .card-body { padding: 15px; display: flex; flex-direction: column; flex-grow: 1; }
+  .card-body h3 { font-size: 15px; margin-bottom: 4px; }
+  .card-body p { color: #7a7a9a; font-size: 12px; margin-bottom: 12px; }
+
+  .pay-btn {
+    margin-top: auto; padding: 10px; background: linear-gradient(45deg, var(--neon-gold), #ff9900);
+    color: #000; border: none; border-radius: 8px; font-weight: 900; cursor: pointer; transition: 0.3s;
+  }
+  .pay-btn:hover { background: var(--neon-green); color: #000; }
+
+  /* MODALS */
+  .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 1000; display: none; align-items: center; justify-content: center; }
+  .modal.active { display: flex; }
+
+  .modal-box {
+    width: 95%; max-width: 500px; background: var(--card-bg); border: 2px solid var(--neon-gold);
+    border-radius: 12px; overflow: hidden; display: flex; flex-direction: column;
+  }
+  .modal-head { padding: 12px 20px; background: #080814; display: flex; justify-content: space-between; align-items: center; }
+  .close-btn { background: #ff0055; color: white; border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+
+  .stage { width: 100%; height: 380px; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+  
+  /* RECHARGE UI */
+  .recharge-content { padding: 25px; text-align: center; }
+  .recharge-content h3 { color: var(--neon-gold); margin-bottom: 10px; }
+  .upi-box { background: #080814; padding: 15px; border-radius: 10px; margin: 15px 0; border: 1px dashed var(--neon-blue); }
+  .add-btn { background: var(--neon-green); padding: 10px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">PAID<span>ARENA</span></div>
+  <div class="wallet-box">
+    <span>💰 Wallet:</span>
+    <span class="balance-txt">₹<span id="userBalance">100</span></span>
+    <button class="add-money-btn" onclick="openRecharge()">+ Add Money</button>
+  </div>
+</header>
+
+<section class="hero">
+  <h1>PAY & PLAY YOUR 20 FAVORITE GAMES</h1>
+  <p>Entry Fee required for each match. Win levels to earn rewards!</p>
+</section>
+
+<!-- 4 CATEGORY BUTTONS -->
+<div class="cat-container">
+  <button class="cat-btn active" onclick="loadCategory('br', this)">
+    <span>🪖</span> Battle Royale (5)
+  </button>
+  <button class="cat-btn" onclick="loadCategory('fps', this)">
+    <span>🎯</span> Tactical FPS (5)
+  </button>
+  <button class="cat-btn" onclick="loadCategory('sandbox', this)">
+    <span>🏎️</span> Action & Drive (5)
+  </button>
+  <button class="cat-btn" onclick="loadCategory('moba', this)">
+    <span>🧠</span> MOBA & Board (5)
+  </button>
+</div>
+
+<main class="main-area">
+  <h2 class="grid-title" id="catTitle">Showing Games</h2>
+  <div class="grid" id="gameGrid"></div>
+</main>
+
+<!-- GAME MODAL -->
+<div class="modal" id="gameModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div>
+        <h3 id="gameTitle">Playing...</h3>
+        <div style="font-size:13px; color:var(--neon-green);">
+          LEVEL: <span id="gLevel">1</span> | SCORE: <span id="gScore">0</span>
+        </div>
+      </div>
+      <button class="close-btn" onclick="closeModal()">Quit Match ✕</button>
+    </div>
+    <div class="stage" id="gameStage"></div>
+  </div>
+</div>
+
+<!-- RECHARGE WALLET MODAL -->
+<div class="modal" id="rechargeModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>💰 Add Money to Wallet</h3>
+      <button class="close-btn" onclick="closeRecharge()">✕</button>
+    </div>
+    <div class="recharge-content">
+      <h3>Scan & Pay via Any UPI</h3>
+      <div class="upi-box">
+        <p style="color:#aaa; font-size:13px;">UPI ID: <b>pay-games@upi</b></p>
+        <p style="margin-top:5px;">Instant Balance Credit Demo</p>
+      </div>
+      <button class="add-btn" onclick="addFunds(100)">+ Add ₹100 Demo Cash</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let walletBalance = 100;
+
+// YOUR 20 EXACT GAMES WITH ENTRY FEES
+const gameDatabase = {
+  br: [
+    { id: 'g1', name: 'PUBG: Battlegrounds', fee: 20, desc: 'Entry: ₹20 | Win reward per level', icon: '🪂' },
+    { id: 'g2', name: 'BGMI Mobile India', fee: 20, desc: 'Entry: ₹20 | Chicken Dinner Match', icon: '🍗' },
+    { id: 'g3', name: 'Free Fire MAX', fee: 15, desc: 'Entry: ₹15 | Fast 10-min clash', icon: '🔥' },
+    { id: 'g4', name: 'Call of Duty: Warzone', fee: 25, desc: 'Entry: ₹25 | High intensity zone fight', icon: '💥' },
+    { id: 'g5', name: 'Apex Legends', fee: 20, desc: 'Entry: ₹20 | Hero arena battle', icon: '⚡' }
+  ],
+  fps: [
+    { id: 'g6', name: 'Valorant', fee: 15, desc: 'Entry: ₹15 | Aim & Ability battle', icon: '🎯' },
+    { id: 'g7', name: 'Counter-Strike 2 (CS2)', fee: 20, desc: 'Entry: ₹20 | Bomb defuse tactics', icon: '💣' },
+    { id: 'g8', name: 'Call of Duty: Mobile', fee: 15, desc: 'Entry: ₹15 | 5v5 Team Deathmatch', icon: '🔫' },
+    { id: 'g9', name: 'Fortnite', fee: 15, desc: 'Entry: ₹15 | Build & shoot fight', icon: '⛏️' },
+    { id: 'g10', name: 'Overwatch Arena', fee: 10, desc: 'Entry: ₹10 | Hero shooter match', icon: '🛡️' }
+  ],
+  sandbox: [
+    { id: 'g11', name: 'Minecraft', fee: 10, desc: 'Entry: ₹10 | Block survival challenge', icon: '🧱' },
+    { id: 'g12', name: 'Roblox', fee: 10, desc: 'Entry: ₹10 | Obby run competition', icon: '🟥' },
+    { id: 'g13', name: 'GTA Online', fee: 25, desc: 'Entry: ₹25 | Street sprint chase', icon: '🏎️' },
+    { id: 'g14', name: 'EA Sports FC 26', fee: 20, desc: 'Entry: ₹20 | Ultimate football match', icon: '⚽' },
+    { id: 'g15', name: 'Among Us', fee: 10, desc: 'Entry: ₹10 | Find the imposter', icon: '🚀' }
+  ],
+  moba: [
+    { id: 'g16', name: 'Clash of Clans', fee: 15, desc: 'Entry: ₹15 | Village raid match', icon: '⚔️' },
+    { id: 'g17', name: 'Mobile Legends: Bang Bang', fee: 15, desc: 'Entry: ₹15 | 5v5 Lane push', icon: '🛡️' },
+    { id: 'g18', name: 'League of Legends', fee: 20, desc: 'Entry: ₹20 | Destroy enemy Nexus', icon: '🏰' },
+    { id: 'g19', name: 'Dota 2', fee: 20, desc: 'Entry: ₹20 | Ancient defense battle', icon: '🌀' },
+    { id: 'g20', name: '8 Ball Pool & Ludo King', fee: 10, desc: 'Entry: ₹10 | Classic 1v1 match', icon: '🎱' }
+  ]
+};
+
+let gameScore = 0, gameLevel = 1, activeLoop = null;
+
+function updateWalletUI() {
+  document.getElementById('userBalance').innerText = walletBalance;
+}
+
+function openRecharge() { document.getElementById('rechargeModal').classList.add('active'); }
+function closeRecharge() { document.getElementById('rechargeModal').classList.remove('active'); }
+
+function addFunds(amount) {
+  walletBalance += amount;
+  updateWalletUI();
+  alert(`₹${amount} added successfully to your wallet!`);
+  closeRecharge();
+}
+
+function loadCategory(cat, btn) {
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+
+  const titles = {
+    br: '🪖 Battle Royale Games (Paid Matches)',
+    fps: '🎯 Tactical FPS & Shooting Games (Paid Matches)',
+    sandbox: '🏎️ Action, Sports & Driving Games (Paid Matches)',
+    moba: '🧠 MOBA, Strategy & Board Games (Paid Matches)'
+  };
+
+  document.getElementById('catTitle').innerText = titles[cat];
+  const grid = document.getElementById('gameGrid');
+  grid.innerHTML = '';
+
+  gameDatabase[cat].forEach(g => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <div class="price-tag">ENTRY: ₹${g.fee}</div>
+      <div class="card-icon">${g.icon}</div>
+      <div class="card-body">
+        <h3>${g.name}</h3>
+        <p>${g.desc}</p>
+        <button class="pay-btn" onclick="startPaidGame('${g.id}', '${g.name}', ${g.fee})">PAY ₹${g.fee} & PLAY ▶</button>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function startPaidGame(id, name, fee) {
+  if (walletBalance < fee) {
+    alert("Insufficient Balance! Please Add Money to your Wallet to play this game.");
+    openRecharge();
+    return;
+  }
+
+  // Deduct Entry Fee
+  walletBalance -= fee;
+  updateWalletUI();
+
+  gameScore = 0; gameLevel = 1; updateStats(0);
+  const modal = document.getElementById('gameModal');
+  const stage = document.getElementById('gameStage');
+  document.getElementById('gameTitle').innerText = name;
+  stage.innerHTML = ''; modal.classList.add('active');
+
+  if(['g1','g2','g3','g4','g5','g6','g7','g8','g9'].includes(id)) engineShooter(stage);
+  else if(id==='g13'||id==='g14') engineDrivingSports(stage);
+  else engineTapStrategy(stage, name);
+}
+
+function updateStats(scoreInc = 0) {
+  gameScore += scoreInc;
+  gameLevel = Math.floor(gameScore / 50) + 1;
+  document.getElementById('gScore').innerText = gameScore;
+  document.getElementById('gLevel').innerText = gameLevel;
+}
+
+function closeModal() {
+  document.getElementById('gameModal').classList.remove('active');
+  document.getElementById('gameStage').innerHTML = '';
+  if(activeLoop) cancelAnimationFrame(activeLoop);
+}
+
+/* ================= GAME ENGINES ================= */
+function engineShooter(stage) {
+  const canvas = document.createElement('canvas'); canvas.width = 340; canvas.height = 320; stage.appendChild(canvas);
+  const ctx = canvas.getContext('2d');
+  let pX = 150, bullets = [], enemies = [];
+
+  setInterval(() => { enemies.push({x: Math.random()*310, y:0, speed: 2 + gameLevel}); }, 800);
+
+  function loop() {
+    ctx.fillStyle='#050512'; ctx.fillRect(0,0,340,320);
+    ctx.fillStyle='#00ff66'; ctx.fillRect(pX, 290, 35, 18);
+
+    ctx.fillStyle='#00d9ff';
+    bullets.forEach((b, bi) => {
+      b.y -= 8; ctx.fillRect(b.x, b.y, 4, 10);
+      enemies.forEach((e, ei) => {
+        if(b.x > e.x && b.x < e.x+25 && b.y > e.y && b.y < e.y+25) {
+          enemies.splice(ei, 1); bullets.splice(bi, 1); updateStats(10);
+        }
+      });
+    });
+
+    ctx.fillStyle='#ff3300';
+    enemies.forEach((e) => { e.y += e.speed; ctx.fillRect(e.x, e.y, 25, 25); });
+
+    activeLoop = requestAnimationFrame(loop);
+  }
+
+  window.onkeydown = e => {
+    if(e.key==='ArrowLeft'&&pX>0) pX-=20; 
+    if(e.key==='ArrowRight'&&pX<305) pX+=20;
+    if(e.key===' ') bullets.push({x: pX+15, y:290});
+  };
+  loop();
+}
+
+function engineDrivingSports(stage) {
+  const canvas = document.createElement('canvas'); canvas.width = 300; canvas.height = 320; stage.appendChild(canvas);
+  const ctx = canvas.getContext('2d');
+  let pX = 130, eY = -60, eX = 130;
+
+  function loop() {
+    eY += 4 + gameLevel * 1.5;
+    if(eY > 320) { eY = -60; eX = Math.random()<0.5?60:180; updateStats(10); }
+
+    ctx.fillStyle='#0f0f1f'; ctx.fillRect(0,0,300,320);
+    ctx.strokeStyle='#333'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(150,0); ctx.lineTo(150,320); ctx.stroke();
+
+    ctx.fillStyle='#00d9ff'; ctx.fillRect(pX, 240, 35, 55);
+    ctx.fillStyle='#ff3300'; ctx.fillRect(eX, eY, 35, 55);
+
+    activeLoop = requestAnimationFrame(loop);
+  }
+  window.onkeydown = e => { if(e.key==='ArrowLeft') pX=60; if(e.key==='ArrowRight') pX=180; };
+  loop();
+}
+
+function engineTapStrategy(stage, name) {
+  stage.innerHTML = `
+    <h2 style="color:var(--neon-gold); text-align:center;">${name}</h2>
+    <p style="margin-top:10px;color:#8a8ab0;text-align:center;">Action Match In Progress. Tap to gain points!</p>
+    <button onclick="updateStats(10)" style="margin-top:25px;padding:15px 30px;background:linear-gradient(45deg, var(--neon-gold), #ff9900);color:#000;border:none;border-radius:10px;font-weight:bold;cursor:pointer;font-size:16px;">
+      ⚡ HIT TARGET / ACTION (+10 PTS)
+    </button>
+  `;
+}
+
+// Initial Load
+loadCategory('br', document.querySelector('.cat-btn'));
+</script>
+</body>
+</html>
